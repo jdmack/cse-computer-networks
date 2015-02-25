@@ -1,0 +1,136 @@
+TODO
+--------------------------------------------------------------------------------
+- add size checking in read message functions to b assured tbat we do not try to read from an address that is not part od the packet
+
+Notes
+--------------------------------------------------------------------------------
+- Network Order = Big Endian
+- Store numeric fields in Little Endian in struct, convert to Big Endian when populating the message field
+
+- jobs | kill %1
+
+Functions
+--------------------------------------------------------------------------------
+sendto()
+recvfrom()
+close()
+socket()
+bind()
+
+bzero() - deprecated, use memset(void * where_to_set, int what_to_set, int how_many)
+fputs()
+
+bcopy() - deprecated, use memcpy(* destination, * source, int size)
+
+htonl() / ntohl() - long integers
+htons() / ntohs() - short integers
+
+
+Packet Types
+--------------------------------------------------------------------------------
+
+  opcode  operation
+  ------  ---------
+    1     Read request (RRQ)
+    2     Write request (WRQ)
+    3     Data (DATA)
+    4     Acknowledgment (ACK)
+    5     Error (ERROR)
+
+
+TFTP Formats
+------------
+
+   Type   Op #     Format without header
+
+          2 bytes    string   1 byte     string   1 byte
+          -----------------------------------------------
+   RRQ/  | 01/02 |  Filename  |   0  |    Mode    |   0  |
+   WRQ    -----------------------------------------------
+
+          2 bytes    2 bytes       n bytes
+          ---------------------------------
+   DATA  | 03    |   Block #  |    Data    |
+          ---------------------------------
+
+          2 bytes    2 bytes
+          -------------------
+   ACK   | 04    |   Block #  |
+          --------------------
+
+          2 bytes  2 bytes        string    1 byte
+          ----------------------------------------
+   ERROR | 05    |  ErrorCode |   ErrMsg   |   0  |
+          ----------------------------------------
+
+
+
+Read request (RRQ) / Write request (WRQ)
+--------------------------------------------------------------------------------
+
+    2 bytes     string    1 byte     string   1 byte
+    ------------------------------------------------
+   | Opcode |  Filename  |   0  |    Mode    |   0  |
+    ------------------------------------------------
+
+516 bytes
+    - 2 (opcode)
+    - 504 (filename)
+    - 1 (filename NUL)
+    - 8 (mode)
+    - 1 (mode NUL)
+
+
+Test RRQ Packet:
+    01666f6f2e747874006f6374657400
+
+    char * packet = 0x01666f6f2e747874006f6374657400;
+
+    opcode:   01
+    filename: 666f6f2e74787400
+    mode:     6f6374657400
+
+
+Data (DATA)
+--------------------------------------------------------------------------------
+
+    2 bytes     2 bytes      n bytes
+    ----------------------------------
+   | Opcode |   Block #  |   Data     |
+    ----------------------------------
+
+
+Acknowledgment (ACK)
+--------------------------------------------------------------------------------
+
+    2 bytes     2 bytes
+    ---------------------
+   | Opcode |   Block #  |
+    ---------------------
+
+
+Error (ERROR)
+--------------------------------------------------------------------------------
+
+
+    2 bytes     2 bytes      string    1 byte
+    -----------------------------------------
+   | Opcode |  ErrorCode |   ErrMsg   |   0  |
+    -----------------------------------------
+
+Error Codes
+--------------------------------------------------------------------------------
+
+   Value     Meaning
+   -----     -------
+   0         Not defined, see error message (if any).
+   1         File not found.
+   2         Access violation.
+   3         Disk full or allocation exceeded.
+   4         Illegal TFTP operation.
+   5         Unknown transfer ID.
+   6         File already exists.
+   7         No such user.
+
+
+

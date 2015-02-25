@@ -1,0 +1,15 @@
+test.c
+*.swp
+a.out
+server_test
+test_echo_client
+tftpclient
+tftpserver
+CLIENT/*
+SERVER/*
+bar.txt
+foo.txt
+code.c
+file_test
+file_test.c
+test
